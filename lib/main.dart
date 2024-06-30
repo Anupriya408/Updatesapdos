@@ -1,39 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'screens/doctors/doctorscreen01.dart';
-import 'screens/login/loginscreen-01.dart';
-import 'screens/login/loginscreen-02.dart';
-import 'screens/login/loginscreen-03.dart';
-import 'screens/doctors/doctorscreen02.dart';
-import 'screens/patients/patientscreen01.dart';
-import 'providers/authprovider.dart';
-import 'theme/theme.dart';
+import 'package:first_project/repositories/auth_repository.dart' as authRepo;
+import 'package:first_project/repositories/doctor/doctor2_repository.dart';
+import 'package:first_project/providers/authprovider.dart';
+import 'package:first_project/bloc/REGISTER/register_bloc.dart';
+import 'package:first_project/bloc/LOGIN/login_bloc.dart';
+import 'package:first_project/screens/login/login_screen_01.dart';
+import 'package:first_project/screens/login/login_screen_02.dart';
+import 'package:first_project/screens/login/login_screen_03.dart';
+import 'package:first_project/screens/doctors/doctor_screen_01.dart';
+import 'package:first_project/screens/patients/patient_screen_01.dart';
+import 'package:first_project/screens/patients/patient_screen_02.dart';
 
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-      ],
-      child: MyApp(),
-    ),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: appTheme,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => LoginScreen01(),
-        '/login': (context) => LoginScreen02(),
-        '/register': (context) => LoginScreen03(),
-        '/doctor': (context) => DoctorScreen(),
-        '/patientscreen01': (context) => PatientScreen(),
-        // '/doctorscreen01': (context) => DoctorScreen01(),
-      },
+    final authRepository = authRepo.AuthenticationRepository();
+    final doctor2Repository = Doctor2Repository();
+    final loginBloc = LoginBloc(authenticationRepository: authRepository);
+    final registerBloc = RegisterBloc(authenticationRepository: authRepository);
+
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<authRepo.AuthenticationRepository>(
+          create: (_) => authRepository,
+        ),
+        ChangeNotifierProvider<AuthProvider>(
+          create: (context) => AuthProvider(
+            doctor2Repository: doctor2Repository,
+          ),
+        ),
+        Provider<Doctor2Repository>(
+          create: (context) => doctor2Repository,
+        ),
+        Provider<LoginBloc>(
+          create: (_) => loginBloc,
+        ),
+        Provider<RegisterBloc>(
+          create: (_) => registerBloc,
+        ),
+      ],
+      child: MaterialApp(
+        title: 'SAPDOS',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => LoginScreen01(),
+          '/login': (context) => LoginScreen02(),
+          '/register': (context) => LoginScreen03(),
+          '/doctor': (context) => DoctorScreen(),
+          '/patient': (context) => PatientScreen(),
+          '/patient/detail': (context) => PatientScreen2(doctorId: ''),
+        },
+      ),
     );
   }
 }

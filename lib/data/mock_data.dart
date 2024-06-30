@@ -63,3 +63,26 @@ const jsonData = {
     }
   ]
 };
+
+// const jsonData = {
+//   "doctors": {
+//     "doctorName": "John Doe",
+//     "pendingAppointments": 10,
+//     "completedAppointments": 30,
+//     "appointments": [
+//       {
+//         "patientName": "Alice",
+//         "patientAge": 25,
+//         "time": "10:00 AM",
+//         "isCompleted": true
+//       },
+//       {
+//         "patientName": "Bob",
+//         "patientAge": 30,
+//         "time": "11:00 AM",
+//         "isCompleted": false
+//       }
+//     ]
+//   }
+// };
+
