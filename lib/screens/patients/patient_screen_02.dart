@@ -3,12 +3,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:first_project/screens/patients/patient_screen_03.dart'; 
 
-
 void main() {
   runApp(MaterialApp(
     home: PatientScreen2(doctorId: '12dcd912-d3e1-4a8c-b07e-be504e5d0412'), 
   ));
 }
+
 class PatientScreen2 extends StatefulWidget {
   final String doctorId;
 
@@ -78,141 +78,289 @@ class _PatientScreen2State extends State<PatientScreen2> {
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
+    var isMobile = screenWidth < 600;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Doctor Details'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.network(
-                    'https://tse1.mm.bing.net/th?id=OIP.L1mnXm4v2-AS1tMDAoUgRgHaLH&pid=Api&rs=1&c=1&qlt=95&w=74&h=112',
-                    height: 100.0,
-                    width: 100.0,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                SizedBox(width: 16.0),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        doctorName,
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(doctorSpecialty),
-                      Text(doctorQualification),
-                      Text('$doctorExperience Years'),
-                      Row(
-                        children: [
-                          Icon(Icons.star, color: Colors.orange),
-                          Icon(Icons.star, color: Colors.orange),
-                          Icon(Icons.star, color: Colors.orange),
-                          Icon(Icons.star_half, color: Colors.orange),
-                          Icon(Icons.star_border, color: Colors.orange),
-                          Text('(512)'),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16.0),
-            Text(
-              doctorDescription,
-              textAlign: TextAlign.justify,
-            ),
-            SizedBox(height: 16.0),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                color: darkBlue,
-                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.access_time, color: Colors.white),
-                    SizedBox(width: 8.0),
-                    Text(
-                      'Available Slots',
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Spacer(),
-                    Icon(Icons.calendar_today, color: Colors.white),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 16.0),
-            isLoading 
-              ? Center(child: CircularProgressIndicator())
-              : Expanded(
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: 3,
-                      crossAxisSpacing: 8.0,
-                      mainAxisSpacing: 8.0,
-                    ),
-                    itemCount: availableSlots.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedSlotIndex = index;
-                          });
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: selectedSlotIndex == index ? darkBlue : Colors.white,
-                            borderRadius: BorderRadius.circular(8.0),
-                            border: Border.all(color: darkBlue),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            availableSlots[index],
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: selectedSlotIndex == index ? Colors.white : darkBlue,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-            SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: selectedSlotIndex != -1
-                  ? () {
-                      // Handle book appointment logic and navigate to PatientScreen3
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Appointment booked for ${availableSlots[selectedSlotIndex]}')));
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => PatientScreen3()),
-                      );
-                    }
-                  : null,
-              child: Text('Book Appointment'),
-            ),
-          ],
-        ),
+        child: isMobile ? _buildMobileLayout() : _buildDesktopLayout(),
       ),
     );
   }
-}
 
+  Widget _buildMobileLayout() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: Image.network(
+                  'https://tse1.mm.bing.net/th?id=OIP.L1mnXm4v2-AS1tMDAoUgRgHaLH&pid=Api&rs=1&c=1&qlt=95&w=74&h=112',
+                  height: 100.0,
+                  width: 100.0,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              SizedBox(width: 16.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      doctorName,
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(doctorSpecialty),
+                    Text(doctorQualification),
+                    Text('$doctorExperience Years'),
+                    Row(
+                      children: [
+                        Icon(Icons.star, color: Colors.orange),
+                        Icon(Icons.star, color: Colors.orange),
+                        Icon(Icons.star, color: Colors.orange),
+                        Icon(Icons.star_half, color: Colors.orange),
+                        Icon(Icons.star_border, color: Colors.orange),
+                        Text('(512)'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16.0),
+          Text(
+            doctorDescription,
+            textAlign: TextAlign.justify,
+          ),
+          SizedBox(height: 16.0),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              color: darkBlue,
+              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              child: Row(
+                children: [
+                  Icon(Icons.access_time, color: Colors.white),
+                  SizedBox(width: 8.0),
+                  Text(
+                    'Available Slots',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Spacer(),
+                  Icon(Icons.calendar_today, color: Colors.white),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 16.0),
+          isLoading 
+            ? Center(child: CircularProgressIndicator())
+            : GridView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 3,
+                  crossAxisSpacing: 8.0,
+                  mainAxisSpacing: 8.0,
+                ),
+                itemCount: availableSlots.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedSlotIndex = index;
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: selectedSlotIndex == index ? darkBlue : Colors.white,
+                        borderRadius: BorderRadius.circular(8.0),
+                        border: Border.all(color: darkBlue),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        availableSlots[index],
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: selectedSlotIndex == index ? Colors.white : darkBlue,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+          SizedBox(height: 16.0),
+          ElevatedButton(
+            onPressed: selectedSlotIndex != -1
+                ? () {
+                    // Handle book appointment logic and navigate to PatientScreen3
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Appointment booked for ${availableSlots[selectedSlotIndex]}')));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => PatientScreen3()),
+                    );
+                  }
+                : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: darkBlue,
+              foregroundColor: Colors.white,
+              padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+            ),
+            child: Text('Book Appointment'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDesktopLayout() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Image.network(
+                'https://tse1.mm.bing.net/th?id=OIP.L1mnXm4v2-AS1tMDAoUgRgHaLH&pid=Api&rs=1&c=1&qlt=95&w=74&h=112',
+                height: 150.0,
+                width: 150.0,
+                fit: BoxFit.cover,
+              ),
+            ),
+            SizedBox(width: 16.0),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    doctorName,
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(doctorSpecialty),
+                  Text(doctorQualification),
+                  Text('$doctorExperience Years'),
+                  Row(
+                    children: [
+                      Icon(Icons.star, color: Colors.orange),
+                      Icon(Icons.star, color: Colors.orange),
+                      Icon(Icons.star, color: Colors.orange),
+                      Icon(Icons.star_half, color: Colors.orange),
+                      Icon(Icons.star_border, color: Colors.orange),
+                      Text('(512)'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 16.0),
+        Text(
+          doctorDescription,
+          textAlign: TextAlign.justify,
+        ),
+        SizedBox(height: 16.0),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            color: darkBlue,
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            child: Row(
+              children: [
+                Icon(Icons.access_time, color: Colors.white),
+                SizedBox(width: 8.0),
+                Text(
+                  'Available Slots',
+                  style: TextStyle
+                    (fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                Spacer(),
+                Icon(Icons.calendar_today, color: Colors.white),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: 16.0),
+        isLoading
+            ? Center(child: CircularProgressIndicator())
+            : GridView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  childAspectRatio: 3,
+                  crossAxisSpacing: 8.0,
+                  mainAxisSpacing: 8.0,
+                ),
+                itemCount: availableSlots.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedSlotIndex = index;
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: selectedSlotIndex == index ? darkBlue : Colors.white,
+                        borderRadius: BorderRadius.circular(8.0),
+                        border: Border.all(color: darkBlue),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        availableSlots[index],
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: selectedSlotIndex == index ? Colors.white : darkBlue,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+        SizedBox(height: 16.0),
+        ElevatedButton(
+          onPressed: selectedSlotIndex != -1
+              ? () {
+                  // Handle book appointment logic and navigate to PatientScreen3
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Appointment booked for ${availableSlots[selectedSlotIndex]}')));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PatientScreen3()),
+                  );
+                }
+              : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: darkBlue,
+            foregroundColor: Colors.white,
+            padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+          ),
+          child: Text('Book Appointment'),
+        ),
+      ],
+    );
+  }
+}
